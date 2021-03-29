@@ -1,5 +1,27 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    TODO
+    <div id="all-posts-title">
+        <h1 class="sub-item">All Posts</h1>
+    </div>
+        <div id="index-container" class="container">
+        {% if user.is_authenticated %}
+            <div id="new-post" class="item">
+                <form id="new-post-form" class="sub-item">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <h4><label for="new-post-input">New Post</label></h4>
+                        <textarea id="new-post-input" class="form-control"></textarea>
+                        <input class="btn btn-primary" type="submit" value="Post">
+                    </div>
+                </form>
+            </div>
+            <div id="all-posts" class="item">
+            </div>
+        {% else %}
+            <div id="please-login" class="item">
+                <h5>Please <a href="{% url 'login' %}">Log In</a> or <a href="{% url 'register' %}">Register</a></h5>
+            </div>
+        {% endif %}
+    </div>
 {% endblock %}

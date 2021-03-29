@@ -1,0 +1,44 @@
+#all-posts-title {
+    margin-left: 10px;
+    padding: 10px;
+}
+
+#index-container {
+    display: grid;
+    grid-template-columns: [col1-start] 100% [col1-end];
+    grid-template-rows: [row1-start] auto [row1-end row2-start] auto [row2-end last-line];
+    row-gap: 2vh;
+    justify-content: stretch;
+    margin-left: 1%;
+    margin-right: 1%;
+    margin-top: 1%;
+    grid-auto-flow: row;
+}
+
+.item {
+    grid-column-start: 1;
+    grid-column-end: span col-1end;
+    justify-self: stretch;
+    border: 1px solid rgb(180, 180, 180);
+    border-radius: 4px;
+    padding: 14px;
+}
+
+.form-group {
+    margin: 0;
+    padding: 0;
+}
+
+#new-post-input {
+    min-height: 100px;
+    padding: 0px;
+    margin: 0px;
+}
+
+.form-group input {
+    margin: 4px;
+}
+
+#please-login {
+    background-color: rgb(210, 210, 210);
+}
