@@ -15,8 +15,12 @@ function loadPosts(page) {
 
     if (page === 'all') {
 
-        document.querySelector('#title').innerHTML = 'All Posts';
-        document.querySelector('#index-container').style.display = 'grid';
+        if (document.querySelector('#title') !== null) {
+            document.querySelector('#title').innerHTML = 'All Posts';
+        }
+        if (document.querySelector('#index-container') !== null) {
+            document.querySelector('#index-container').style.display = 'grid';
+        }
         document.querySelector('body').style.backgroundColor = 'red';
     }
 
@@ -60,7 +64,9 @@ function loadPosts(page) {
                 postDiv.append(userTimeDiv);
                 postDiv.append(post_body);
                 postDiv.append(likes);
-                document.querySelector('#all-posts').append(postDiv);
+                if (document.querySelector('#all-posts') !== null) {
+                    document.querySelector('#all-posts').append(postDiv);
+                }
             })
         })
 }
