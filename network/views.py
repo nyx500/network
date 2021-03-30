@@ -36,7 +36,7 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
-def posts(request):
+def post(request):
 
     if request.method != "POST":
         return JsonResponse({"error": "POST request required."}, status=400)
@@ -79,3 +79,12 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+def view_posts(request, posts): 
+
+    if posts == 'all':
+        all_posts = Post.objects.all()
+        return JsonResponse([post.serialize() for post in all_posts], safe=False)
+    else:
+        return JsonResponse({"error": "Page invalid."}, status=400)

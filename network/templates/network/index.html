@@ -1,10 +1,10 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    <div id="all-posts-title">
-        <h1 class="sub-item">All Posts</h1>
+    <div id="title">
+        <h1 class="sub-item"></h1>
     </div>
-        <div id="index-container" class="container">
+    <div id="index-container" class="container">
         {% if user.is_authenticated %}
             <div id="new-post" class="item">
                 <form id="new-post-form" class="sub-item">
