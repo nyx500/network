@@ -15,7 +15,8 @@ class Post(models.Model):
             "id": self.id,
             "user": self.user.username,
             "body": self.body,
-            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p")
+            "timestamp": self.timestamp.strftime("%b %d %Y, %I:%M %p"),
+            "likes": self.likes.all().count()
         }
 
 class Like(models.Model):
