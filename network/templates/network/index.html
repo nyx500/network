@@ -16,12 +16,12 @@
                     </div>
                 </form>
             </div>
-            <div id="all-posts" class="item">
-            </div>
         {% else %}
             <div id="please-login" class="item">
-                <h5>Please <a href="{% url 'login' %}">Log In</a> or <a href="{% url 'register' %}">Register</a></h5>
+                <h5>Please <a href="{% url 'login' %}">Log In</a> or <a href="{% url 'register' %}">Register</a> to submit a new post</h5>
             </div>
         {% endif %}
+        <div id="all-posts" class="item">
+        </div>
     </div>
 {% endblock %}

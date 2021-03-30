@@ -2,10 +2,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadPosts('all');
 
-    document.querySelector('#new-post-form').onsubmit = function() {
-        getCookie('csrftoken');
-        newPost();
+    if (document.querySelector('#new-post-form') !== null) {
+        document.querySelector('#new-post-form').onsubmit = function() {
+            getCookie('csrftoken');
+            newPost();
+        }
     }
+
 });
 
 function loadPosts(page) {
@@ -27,13 +30,34 @@ function loadPosts(page) {
                 postDiv.style.padding = '5px';
                 postDiv.style.borderRadius = '6px';
                 postDiv.style.marginBottom = '10px';
-                const username_and_timestamp = document.createElement('h5');
-                username_and_timestamp.innerHTML = `${post.user} at ${post.timestamp}:`;
+                postDiv.style.display = 'flex';
+                postDiv.style.flexDirection = 'column';
+                postDiv.style.flexWrap = 'wrap';
+                const userTimeDiv = document.createElement('div');
+                userTimeDiv.style.display = 'flex';
+                userTimeDiv.style.flexDirection = 'row';
+                userTimeDiv.style.flexWrap = 'nowrap';
+                userTimeDiv.style.justifyContent = 'space-between';
+                userTimeDiv.style.order = '1';
+                const username = document.createElement('h5');
+                username.innerHTML = `${post.user}`;
+                username.style.order = '1';
+                username.style.alignSelf = 'flex-start';
+                userTimeDiv.append(username);
+                const timestamp = document.createElement('h5');
+                timestamp.innerHTML = `${post.timestamp}`;
+                timestamp.style.order = '2';
+                timestamp.style.alignSelf = 'flex-end';
+                userTimeDiv.append(timestamp);
                 const post_body = document.createElement('h6');
                 post_body.innerHTML = post.body;
+                post_body.style.order = '2';
+                post_body.style.alignSelf = 'stretch';
                 const likes = document.createElement('h6');
                 likes.innerHTML = `Likes: ${post.likes}`;
-                postDiv.append(username_and_timestamp);
+                likes.style.order = '3';
+                likes.style.alignSelf = 'flex-start';
+                postDiv.append(userTimeDiv);
                 postDiv.append(post_body);
                 postDiv.append(likes);
                 document.querySelector('#all-posts').append(postDiv);
