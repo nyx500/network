@@ -27,17 +27,14 @@ function loadPosts(page) {
                 postDiv.style.padding = '5px';
                 postDiv.style.borderRadius = '6px';
                 postDiv.style.marginBottom = '10px';
-                const username = document.createElement('h5');
-                username.innerHTML = post.user;
+                const username_and_timestamp = document.createElement('h5');
+                username_and_timestamp.innerHTML = `${post.user} at ${post.timestamp}:`;
                 const post_body = document.createElement('h6');
                 post_body.innerHTML = post.body;
-                const time = document.createElement('h6');
-                time.innerHTML = `Posted: ${post.timestamp}`;
                 const likes = document.createElement('h6');
                 likes.innerHTML = `Likes: ${post.likes}`;
-                postDiv.append(username);
+                postDiv.append(username_and_timestamp);
                 postDiv.append(post_body);
-                postDiv.append(time);
                 postDiv.append(likes);
                 document.querySelector('#all-posts').append(postDiv);
             })
