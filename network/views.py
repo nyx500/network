@@ -84,7 +84,7 @@ def register(request):
 def view_posts(request, posts): 
 
     if posts == 'all':
-        all_posts = Post.objects.all()
+        all_posts = Post.objects.all().order_by('-timestamp')
         return JsonResponse([post.serialize() for post in all_posts], safe=False)
     else:
         return JsonResponse({"error": "Page invalid."}, status=400)
