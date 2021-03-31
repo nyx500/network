@@ -87,4 +87,6 @@ def view_posts(request, posts):
         all_posts = Post.objects.all().order_by('-timestamp')
         return JsonResponse([post.serialize() for post in all_posts], safe=False)
     else:
-        return JsonResponse({"error": "Page invalid."}, status=400)
+        select_user = User.objects.get(username=posts)
+        user_posts = select_user.posts.all()
+        return JsonResponse([post.serialize() for post in user_posts], safe=False)

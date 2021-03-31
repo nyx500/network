@@ -5,6 +5,12 @@
     font-weight: bold;
 }
 
+.username-link {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
 #index-container {
     display: grid;
     grid-template-columns: [col1-start] 100% [col1-end];

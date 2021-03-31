@@ -1,9 +1,14 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 
 
 class User(AbstractUser):
-    pass
+    following = models.ManyToManyField('self', related_name='followers', symmetrical=False)
+
+    def __str__(self):
+        return f'User ID: {self.id}, Username: {self.username}, Following: {self.following.all()}, Followers: {self.followers.all()}'
+
 
 class Post(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")
