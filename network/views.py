@@ -4,6 +4,7 @@ from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
+from django.core import serializers
 
 from .models import *
 
@@ -88,5 +89,10 @@ def view_posts(request, posts):
         return JsonResponse([post.serialize() for post in all_posts], safe=False)
     else:
         select_user = User.objects.get(username=posts)
-        user_posts = select_user.posts.all()
+        user_posts = select_user.posts.all().order_by('-timestamp')
         return JsonResponse([post.serialize() for post in user_posts], safe=False)
+
+def get_user(request, username):
+    username1 = username
+    users = User.objects.filter(username=username1)
+    return JsonResponse([user.serialize() for user in users], safe=False)

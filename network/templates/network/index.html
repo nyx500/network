@@ -2,7 +2,14 @@
 
 {% block body %}
     <div id="title">
-        <h1 class="sub-item"></h1>
+        <h1 id="title-text"></h1>
+    </div>
+    <div id="followers">
+        <h4 id="followers-text"></h4>
+        <h4 id="following-text"></h4>
+        {% if user.is_authenticated %}
+            {{ request.user.username|json_script:"user_username" }}
+        {% endif %}
     </div>
     <div id="index-container" class="container">
         {% if user.is_authenticated %}

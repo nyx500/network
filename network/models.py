@@ -6,9 +6,13 @@ from django.conf import settings
 class User(AbstractUser):
     following = models.ManyToManyField('self', related_name='followers', symmetrical=False)
 
-    def __str__(self):
-        return f'User ID: {self.id}, Username: {self.username}, Following: {self.following.all()}, Followers: {self.followers.all()}'
-
+    def serialize(self):
+         return {
+            "id": self.id,
+            "username": self.username,
+            "following": self.following.all().count(),
+            "followers": self.followers.all().count()
+        }
 
 class Post(models.Model):
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="posts")

@@ -3,12 +3,46 @@
     padding: 10px;
     font-size: 42px;
     font-weight: bold;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+#followers {
+    margin-left: 10px;
+    padding: 10px;
+    font-size: 36px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+#title-text {
+    order: 1;
+    align-self: flex-start;
+}
+
+#followers-text {
+    order: 1;
+    align-self: flex-start;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+#following-text {
+    order: 2;
+    align-self: auto;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .username-link {
     font-size: 28px;
     font-weight: bold;
     margin-bottom: 10px;
+    cursor: pointer;
 }
 
 #index-container {
@@ -52,4 +86,8 @@
 
 #please-login {
     background-color: rgb(210, 210, 210);
+}
+
+#title {
+    cursor: pointer;
 }
