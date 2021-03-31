@@ -96,3 +96,12 @@ def get_user(request, username):
     username1 = username
     users = User.objects.filter(username=username1)
     return JsonResponse([user.serialize() for user in users], safe=False)
+
+def follow(request, username):
+    username1 = username
+    user = User.objects.get(username=username1)
+    followers = user.followers.all()
+    if request.user in followers:
+        return JsonResponse({'answer': True})
+    else:
+        return JsonResponse({'answer': False})

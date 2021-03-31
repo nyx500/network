@@ -84,8 +84,26 @@ function loadPosts(page, username) {
                 if (document.getElementById('user_username')) {
                     console.log(`User Response: ${response[0].username}`);
                     console.log(`User username: ${JSON.parse(document.getElementById('user_username').textContent)}`);
-                    if (response[0].username === JSON.parse(document.getElementById('user_username').textContent)) {
+                    if (response[0].username !== JSON.parse(document.getElementById('user_username').textContent)) {
+
                         document.querySelector('body').style.backgroundColor = 'grey';
+
+                        fetch(`/follow/${username}`)
+                            .then(response => response.json())
+                            .then(response => {
+                                console.log(`Answer: ${response['answer']}`)
+                                if (response['answer'] === false) {
+                                    button = document.createElement('button');
+                                    button.className = 'follow btn btn-primary';
+                                    button.innerHTML = "Follow";
+                                    button.style.order = '3';
+                                    button.style.alignSelf = 'flex-end';
+                                    button.style.marginLeft = '20px';
+                                    button.style.marginRight = '20px';
+                                    document.querySelector('#followers').append(button);
+                                }
+                            })
+
                     }
                 }
 
