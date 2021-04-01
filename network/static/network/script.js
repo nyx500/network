@@ -28,6 +28,9 @@ function loadPosts(page, username) {
 
     console.log(page, );
 
+    if (document.querySelector('button')) {
+        document.querySelector('button').remove();
+    }
 
     if (page === 'all') {
 
@@ -62,6 +65,20 @@ function loadPosts(page, username) {
 
     if (page === 'user') {
 
+        fetch(`/get_user/${username}`)
+            .then(response => response.json())
+            .then(response => {
+
+                JSON.stringify(response);
+
+                document.querySelector('#followers-text').innerHTML = '';
+                document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
+                document.querySelector('#following-text').innerHTML = '';
+                document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
+
+                console.log(`THIS PAGE'S USER: ${JSON.stringify(response)}`);
+            })
+
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
         }
@@ -73,43 +90,6 @@ function loadPosts(page, username) {
                 loadPosts('user', username);
             }
         }
-
-        fetch(`/get_user/${username}`)
-            .then(response => response.json())
-            .then(response => {
-                JSON.stringify(response);
-                document.querySelector('#followers-text').innerHTML = `Followers: ${response[0].followers}`;
-                document.querySelector('#following-text').innerHTML = `Following: ${response[0].following}`;
-                console.log(`USER: ${JSON.stringify(response)}`);
-                if (document.getElementById('user_username')) {
-                    console.log(`User Response: ${response[0].username}`);
-                    console.log(`User username: ${JSON.parse(document.getElementById('user_username').textContent)}`);
-                    if (response[0].username !== JSON.parse(document.getElementById('user_username').textContent)) {
-
-                        document.querySelector('body').style.backgroundColor = 'grey';
-
-                        fetch(`/follow/${username}`)
-                            .then(response => response.json())
-                            .then(response => {
-                                console.log(`Answer: ${response['answer']}`)
-                                if (response['answer'] === false) {
-                                    button = document.createElement('button');
-                                    button.className = 'follow btn btn-primary';
-                                    button.innerHTML = "Follow";
-                                    button.style.order = '3';
-                                    button.style.alignSelf = 'flex-end';
-                                    button.style.marginLeft = '20px';
-                                    button.style.marginRight = '20px';
-                                    document.querySelector('#followers').append(button);
-                                }
-                            })
-
-                    }
-                }
-
-
-            })
-
 
         fetch(`/view_posts/${username}`)
             .then(response => response.json())
@@ -126,8 +106,109 @@ function loadPosts(page, username) {
                     printPost(post);
                 })
             })
-    }
 
+        if (document.getElementById('user_username')) {
+
+            console.log(`User which page this is: ${username}`);
+            console.log(`Logged in user's username: ${JSON.parse(document.getElementById('user_username').textContent)}`);
+
+            if (username !== `${JSON.parse(document.getElementById('user_username').textContent)}`) {
+                var result = "different";
+            } else {
+                var result = "same";
+            }
+
+            console.log(`Status: ${result}`);
+
+            if (result === "different") {
+
+                document.querySelector('body').style.backgroundColor = 'grey';
+
+                fetch(`/follow/${username}`)
+                    .then(response => response.json())
+                    .then(response => {
+
+                        var answer = response['answer']
+
+                        console.log(`Answer: ${answer}`);
+
+                        button = document.createElement('button');
+                        button.className = 'follow btn btn-primary';
+                        button.style.order = '3';
+                        button.style.alignSelf = 'flex-end';
+                        button.style.marginLeft = '20px';
+                        button.style.marginRight = '20px';
+
+                        if (response['answer'] === false) {
+                            button.innerHTML = "Follow";
+                            document.querySelector('#followers').append(button);
+                            console.log("Button follow");
+                            button.onclick = function() {
+
+                                fetch(`/follow/${username}`, {
+                                        method: 'PUT',
+                                        body: JSON.stringify({
+                                            follow: "yes"
+                                        })
+                                    })
+                                    .catch(err => console.log(err));
+
+                                fetch(`/get_user/${username}`)
+                                    .then(response => response.json())
+                                    .then(response => {
+
+                                        document.querySelector('#followers-text').innerHTML = '';
+                                        document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
+                                        document.querySelector('#following-text').innerHTML = '';
+                                        document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
+
+                                        console.log(`THIS PAGE'S USER: ${JSON.stringify(response)}`);
+                                    })
+
+
+                                loadPosts('user', username);
+
+                                console.log(`Followed ${username}`);
+                            }
+                        } else {
+                            button.innerHTML = '';
+                            button.innerHTML = "Unfollow";
+                            document.querySelector('#followers').append(button);
+                            console.log("Button unfollow");
+                            button.onclick = function() {
+
+                                fetch(`/follow/${username}`, {
+                                        method: 'PUT',
+                                        body: JSON.stringify({
+                                            follow: "no"
+                                        })
+                                    })
+                                    .catch(err => console.log(err));
+
+
+                                fetch(`/get_user/${username}`)
+                                    .then(response => response.json())
+                                    .then(response => {
+
+                                        document.querySelector('#followers-text').innerHTML = '';
+                                        document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
+                                        document.querySelector('#following-text').innerHTML = '';
+                                        document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
+
+                                        console.log(`THIS PAGE'S USER: ${JSON.stringify(response)}`);
+                                        loadPosts('user', username);
+                                    })
+
+                                console.log(`Unfollowed ${username}`);
+                            }
+                        }
+
+                    })
+            } else {
+                document.querySelector('body').style.backgroundColor = 'magenta';
+            }
+        }
+    }
 }
 
 function getCookie(name) {

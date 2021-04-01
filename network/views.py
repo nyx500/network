@@ -5,6 +5,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.core import serializers
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 
 from .models import *
 
@@ -97,11 +99,33 @@ def get_user(request, username):
     users = User.objects.filter(username=username1)
     return JsonResponse([user.serialize() for user in users], safe=False)
 
+@csrf_exempt
+@login_required
 def follow(request, username):
+
     username1 = username
     user = User.objects.get(username=username1)
-    followers = user.followers.all()
-    if request.user in followers:
-        return JsonResponse({'answer': True})
+
+    if request.method == "GET":
+        followers = user.followers.all()
+        if request.user in followers:
+            return JsonResponse({'answer': True})
+        else:
+            return JsonResponse({'answer': False})
+
+    elif request.method == "PUT":
+        data = json.loads(request.body)
+        if data.get("follow") is not None:
+            if data["follow"] == "yes":
+                request.user.following.add(user)
+            else:
+                request.user.following.remove(user)
+            request.user.save()
+        return HttpResponse(status=204)
+
+    
+    
     else:
-        return JsonResponse({'answer': False})
+        return JsonResponse({
+        "error": "GET or PUT request required."
+    }, status=400)
