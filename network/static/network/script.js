@@ -1,6 +1,16 @@
+let counter = 0;
+
+const quantity = 10;
+
 document.addEventListener('DOMContentLoaded', function() {
 
     loadPosts('all', null);
+
+    if (document.getElementById('user_username')) {
+        var logged_in_username = JSON.parse(document.getElementById('user_username').textContent);
+    } else {
+        var logged_in_username = null;
+    }
 
     if (document.querySelector('#new-post-form') !== null) {
         document.querySelector('#new-post-form').onsubmit = function() {
@@ -9,12 +19,28 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-
-    document.querySelector('#username').addEventListener('click', () => {
-        username = JSON.parse(document.getElementById('user_username').textContent);
-        loadPosts('user', username);
-        document.querySelector('body').style.backgroundColor = 'green';
+    document.querySelector('#network').addEventListener('click', () => {
+        loadPosts('all', null);
     })
+
+    document.querySelector('#all').addEventListener('click', () => {
+        loadPosts('all', null);
+    })
+
+    if (logged_in_username != null) {
+
+        document.querySelector('#username').addEventListener('click', () => {
+            loadPosts('user', logged_in_username);
+            document.querySelector('body').style.backgroundColor = 'green';
+        })
+
+        document.querySelector('#follow-link').addEventListener('click', () => {
+            document.querySelector('body').style.backgroundColor = 'orange';
+            username = JSON.parse(document.getElementById('user_username').textContent);
+            loadPosts('following', username);
+        })
+    }
+
 
     while (document.querySelector('.individual-post')) {
         document.querySelectorAll('.individual-post').forEach(post => {
@@ -26,7 +52,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadPosts(page, username) {
 
-    console.log(page, );
+    if (document.querySelector('#new-post')) {
+        document.querySelector('#new-post').style.display = 'block';
+    }
 
     if (document.querySelector('button')) {
         document.querySelector('button').remove();
@@ -34,19 +62,25 @@ function loadPosts(page, username) {
 
     if (page === 'all') {
 
+        const start = counter;
+        const end = start + quantity - 1;
+        counter = end + 1;
+
+
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = 'All Posts';
             document.querySelector('#title-text').onclick = function() {
                 loadPosts('all', null);
             }
         }
+
         if (document.querySelector('#index-container') !== null) {
             document.querySelector('#index-container').style.display = 'grid';
         }
 
         document.querySelector('body').style.backgroundColor = 'red';
 
-        fetch(`/view_posts/${page}`)
+        fetch(`/view_posts/${page}?start=${start}&end=${end}`)
             .then(response => response.json())
             .then(posts => {
                 console.log(posts);
@@ -61,9 +95,38 @@ function loadPosts(page, username) {
                     printPost(post);
                 })
             })
-    }
+    } else if (page === 'following') {
 
-    if (page === 'user') {
+
+        if (document.querySelector('#new-post')) {
+            document.querySelector('#new-post').style.display = 'none';
+        }
+
+        if (document.querySelector('#title') !== null) {
+            document.querySelector('#title-text').innerHTML = 'Following';
+        }
+
+        fetch(`/view_posts/${page}`)
+            .then(response => response.json())
+            .then(posts => {
+                console.log(posts);
+                while (document.querySelector('.individual-post')) {
+                    document.querySelectorAll('.individual-post').forEach(post => {
+                        post.remove();
+                    })
+                }
+                posts.forEach(post => {
+                    console.log(posts);
+                    printPost(post);
+                })
+            })
+
+    } else if (page === 'user') {
+
+
+        if (document.querySelector('#new-post')) {
+            document.querySelector('#new-post').style.display = 'none';
+        }
 
         fetch(`/get_user/${username}`)
             .then(response => response.json())
@@ -79,9 +142,6 @@ function loadPosts(page, username) {
                 console.log(`THIS PAGE'S USER: ${JSON.stringify(response)}`);
             })
 
-        if (document.querySelector('#new-post')) {
-            document.querySelector('#new-post').style.display = 'none';
-        }
         console.log(`USERNAME: ${username}`);
 
         if (document.querySelector('#title') !== null) {

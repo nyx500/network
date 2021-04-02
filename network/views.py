@@ -7,8 +7,11 @@ from django.urls import reverse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-
+from django.core.paginator import Paginator
+from django.views.generic import ListView
 from .models import *
+import time
+import math
 
 
 def index(request):
@@ -86,9 +89,49 @@ def register(request):
 
 def view_posts(request, posts): 
 
+    start = int(request.GET.get("start") or 0)
+    end = int(request.GET.get("end") or (start + 9))
+
     if posts == 'all':
+
         all_posts = Post.objects.all().order_by('-timestamp')
-        return JsonResponse([post.serialize() for post in all_posts], safe=False)
+
+        data = []
+
+        amount = len(all_posts) - 1
+
+        if amount > start:
+            if amount > end:
+                for i in range(start, end + 1):
+                    data.append(all_posts[i])
+            else:
+                for i in range(start, amount + 1):
+                    data.append(all_posts[i])
+        else:
+            number_posts = int(len(all_posts))
+            modulo = len(all_posts) % 10
+            if modulo == 0:
+                modulo = 10
+            multiples_10 = math.floor(amount/10)
+            for i in range((amount + 1 - modulo), amount + 1):
+                data.append(all_posts[i])
+        
+        time.sleep(1)
+
+        return JsonResponse([post.serialize() for post in data], safe=False)
+
+    elif posts == 'following':
+            if request.user.is_authenticated:
+                user = request.user
+                followed_users = user.following.all()
+                followed_posts = []
+                all_posts = Post.objects.all().order_by('-timestamp')
+                for post in all_posts:
+                    if post.user in followed_users:
+                        followed_posts.append(post)
+                return JsonResponse([post.serialize() for post in followed_posts], safe=False)
+            else:
+                return JsonResponse({"ERROR": "Please log in"})
     else:
         select_user = User.objects.get(username=posts)
         user_posts = select_user.posts.all().order_by('-timestamp')
