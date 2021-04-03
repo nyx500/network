@@ -104,9 +104,11 @@ def view_posts(request, posts):
             if amount > end:
                 for i in range(start, end + 1):
                     data.append(all_posts[i])
+                    is_more = "more_posts"
             else:
                 for i in range(start, amount + 1):
                     data.append(all_posts[i])
+                    is_more = "last_posts"
         else:
             number_posts = int(len(all_posts))
             modulo = len(all_posts) % 10
@@ -115,10 +117,23 @@ def view_posts(request, posts):
             multiples_10 = math.floor(amount/10)
             for i in range((amount + 1 - modulo), amount + 1):
                 data.append(all_posts[i])
+            is_more = "reloading_last"
         
-        time.sleep(1)
+        if data[0] == all_posts[0]:
+            is_earlier = False
+        else:
+            is_earlier = True 
 
-        return JsonResponse([post.serialize() for post in data], safe=False)
+        posts = [post.serialize() for post in data]
+        all_data = []
+        dict_posts = {"posts": posts}
+        all_data.append(dict_posts)
+        dict_status = {"pages_loaded": is_more}
+        all_data.append(dict_status)
+        dict_earlier = {"earlier": is_earlier}
+        all_data.append(dict_earlier)
+
+        return JsonResponse(all_data, safe=False)
 
     elif posts == 'following':
             if request.user.is_authenticated:
