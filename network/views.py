@@ -12,6 +12,7 @@ from django.views.generic import ListView
 from .models import *
 import time
 import math
+from .functions import paginate
 
 
 def index(request):
@@ -95,43 +96,9 @@ def view_posts(request, posts):
     if posts == 'all':
 
         all_posts = Post.objects.all().order_by('-timestamp')
-
-        data = []
-
         amount = len(all_posts) - 1
 
-        if amount > start:
-            if amount > end:
-                for i in range(start, end + 1):
-                    data.append(all_posts[i])
-                    is_more = "more_posts"
-            else:
-                for i in range(start, amount + 1):
-                    data.append(all_posts[i])
-                    is_more = "last_posts"
-        else:
-            number_posts = int(len(all_posts))
-            modulo = len(all_posts) % 10
-            if modulo == 0:
-                modulo = 10
-            multiples_10 = math.floor(amount/10)
-            for i in range((amount + 1 - modulo), amount + 1):
-                data.append(all_posts[i])
-            is_more = "reloading_last"
-        
-        if data[0] == all_posts[0]:
-            is_earlier = False
-        else:
-            is_earlier = True 
-
-        posts = [post.serialize() for post in data]
-        all_data = []
-        dict_posts = {"posts": posts}
-        all_data.append(dict_posts)
-        dict_status = {"pages_loaded": is_more}
-        all_data.append(dict_status)
-        dict_earlier = {"earlier": is_earlier}
-        all_data.append(dict_earlier)
+        all_data = paginate(start, end, amount, all_posts)
 
         return JsonResponse(all_data, safe=False)
 
