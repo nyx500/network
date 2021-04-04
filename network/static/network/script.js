@@ -71,10 +71,6 @@ function loadPosts(page, username) {
 
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = 'All Posts';
-            document.querySelector('#title').onclick = function() {
-                counter = 0;
-                loadPosts('all', null);
-            }
         }
 
         if (document.querySelector('#index-container') !== null) {
@@ -86,53 +82,19 @@ function loadPosts(page, username) {
         fetch(`/view_posts/${page}?start=${start}&end=${end}`)
             .then(response => response.json())
             .then(posts => {
-
                 while (document.querySelector('.individual-post')) {
                     document.querySelectorAll('.individual-post').forEach(post => {
                         post.remove();
                     })
                 }
-
                 var actual_posts = posts[0]["posts"];
                 actual_posts.forEach(post => {
                     printPost(post);
                 })
 
-                if (posts[1]["pages_loaded"] == "more_posts") {
-                    const next = document.createElement('button');
-                    next.innerHTML = "Next";
-                    next.className = "next-button btn btn-primary";
-                    document.querySelector('#all-posts').append(next);
-                    next.addEventListener('click', () => {
-                        loadPosts('all', null);
-                    })
-                } else {
-                    if (document.querySelector('.next-button')) {
-                        document.querySelector('.next-button').remove();
-                    }
-                }
-
-                if (posts[2]["earlier"] === true) {
-                    const previous = document.createElement('button');
-                    previous.innerHTML = "Previous";
-                    previous.className = "previous-button btn btn-primary";
-                    document.querySelector('#all-posts').append(previous);
-                    previous.addEventListener('click', () => {
-                        if (counter - quantity >= 0) {
-                            counter -= quantity * 2;
-                        } else {
-                            counter = 0;
-                        }
-                        loadPosts('all', null);
-
-                    })
-                } else {
-                    if (document.querySelector('.previous-button')) {
-                        document.querySelector('.previous-button').remove;
-                    }
-                }
-
+                pagination(posts);
             })
+
     } else if (page === 'following') {
 
 
@@ -405,5 +367,42 @@ function printPost(post) {
     postDiv.append(likes);
     if (document.querySelector('#all-posts') !== null) {
         document.querySelector('#all-posts').append(postDiv);
+    }
+}
+
+function pagination(posts) {
+
+    if (document.querySelector('.next-button')) {
+        document.querySelector('.next-button').remove();
+    }
+
+    if (posts[1]["pages_loaded"] == "more_posts") {
+        const next = document.createElement('button');
+        next.innerHTML = "Next";
+        next.className = "next-button btn btn-primary";
+        document.querySelector('#all-posts').append(next);
+        next.addEventListener('click', () => {
+            loadPosts('all', null);
+        })
+    }
+
+    if (posts[2]["earlier"] === true) {
+        const previous = document.createElement('button');
+        previous.innerHTML = "Previous";
+        previous.className = "previous-button btn btn-primary";
+        document.querySelector('#all-posts').append(previous);
+        previous.addEventListener('click', () => {
+            if (counter - quantity >= 0) {
+                counter -= quantity * 2;
+            } else {
+                counter = 0;
+            }
+            loadPosts('all', null);
+
+        })
+    } else {
+        if (document.querySelector('.previous-button')) {
+            document.querySelector('.previous-button').remove;
+        }
     }
 }
