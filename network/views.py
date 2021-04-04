@@ -148,13 +148,18 @@ def view_posts(request, posts):
             else:
                 return JsonResponse({"ERROR": "Please log in"})
     else:
-        select_user = User.objects.get(username=posts)
-        user_posts = select_user.posts.all().order_by('-timestamp')
-        return JsonResponse([post.serialize() for post in user_posts], safe=False)
+        if User.objects.filter(username=posts).exists():
+            select_user = User.objects.get(username=posts)
+            user_posts = select_user.posts.all().order_by('-timestamp')
+            return JsonResponse([post.serialize() for post in user_posts], safe=False)
+        else:
+            return JsonResponse({"Error": "No such user/page"})
 
 def get_user(request, username):
-    username1 = username
-    users = User.objects.filter(username=username1)
+    if User.objects.filter(username=username).exists():
+        users = User.objects.filter(username=username)
+    else:
+        return JsonResponse({"ERROR": "No such user exists"})
     return JsonResponse([user.serialize() for user in users], safe=False)
 
 @csrf_exempt

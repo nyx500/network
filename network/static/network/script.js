@@ -71,7 +71,8 @@ function loadPosts(page, username) {
 
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = 'All Posts';
-            document.querySelector('#title-text').onclick = function() {
+            document.querySelector('#title').onclick = function() {
+                counter = 0;
                 loadPosts('all', null);
             }
         }
