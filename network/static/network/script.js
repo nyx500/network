@@ -99,7 +99,7 @@ function loadPosts(page, username) {
                 console.log(`earlier: ${posts[2]["earlier"]}`)
                 var actual_posts = posts[0]["posts"];
                 actual_posts.forEach(post => {
-                    printPost(post);
+                    printPost('all', username, post);
                 })
 
                 pagination(posts, 'all', username);
@@ -129,7 +129,7 @@ function loadPosts(page, username) {
                 }
                 console.log(`Followed posts: ${posts}`);
                 posts[0]["posts"].forEach(post => {
-                    printPost(post);
+                    printPost('following', username, post);
                 })
 
                 pagination(posts, 'following', username);
@@ -169,7 +169,7 @@ function loadPosts(page, username) {
                     })
                 }
                 posts[0]["posts"].forEach(post => {
-                    printPost(post);
+                    printPost('user', username, post);
                 })
                 pagination(posts, 'user', username);
             })
@@ -218,7 +218,7 @@ function newPost() {
 
 }
 
-function printPost(post) {
+function printPost(page, username, post) {
 
     const postDiv = document.createElement('div');
     postDiv.className = "individual-post";
@@ -229,25 +229,44 @@ function printPost(post) {
     userTimeDiv.style.justifyContent = 'space-between';
     userTimeDiv.style.order = '1';
 
-    const username = document.createElement('h2');
-    username.innerHTML = `${post.user}`;
-    username.className = 'username-link';
+    const username_heading = document.createElement('h2');
+    username_heading.innerHTML = `${post.user}`;
+    username_heading.className = 'username-link';
 
-    username.onclick = function() {
+    username_heading.onclick = function() {
         counter = 0;
         loadPosts('user', post.user);
     }
 
-    userTimeDiv.append(username);
+    userTimeDiv.append(username_heading);
 
     const timestamp = document.createElement('h5');
     timestamp.innerHTML = `${post.timestamp}`;
     timestamp.style.order = '2';
     timestamp.style.alignSelf = 'flex-end';
     userTimeDiv.append(timestamp);
+    const post_container = document.createElement('div');
+    post_container.className = 'post-container';
     const post_body = document.createElement('h6');
     post_body.className = 'post-body'
     post_body.innerHTML = post.body;
+    post_container.append(post_body);
+    const input_container = document.createElement('div');
+    input_container.className = 'input-container';
+    const text_input = document.createElement('textarea');
+    text_input.id = 'textInput';
+    text_input.className = 'text-input';
+    text_input.cols = "144";
+    text_input.rows = "3";
+    text_input.style.display = 'none';
+    input_container.append(text_input);
+    const submit = document.createElement('button');
+    submit.id = 'submit';
+    submit.className = 'submit-button btn btn-primary';
+    submit.innerHTML = "Save";
+    submit.style.display = 'none';
+    input_container.append(submit);
+    post_container.append(input_container);
 
     const likes_flex = document.createElement('div');
     likes_flex.className = 'likes-flex';
@@ -261,10 +280,42 @@ function printPost(post) {
         edit_button.className = 'edit-button btn btn-light';
         edit_button.innerHTML = "Edit";
         likes_flex.append(edit_button);
+
+        edit_button.onclick = () => {
+            post_body.style.display = 'none';
+            likes_flex.remove();
+            text_input.style.display = 'block';
+            submit.style.display = 'block';
+            text_input.innerHTML = post.body;
+            submit.addEventListener("click", (event) => {
+                event.preventDefault();
+                let input_text = text_input.value;
+                let newTextObj = {
+                    body: `${input_text}`
+                };
+                fetch(`/edit/${post.id}`, {
+                        method: 'POST',
+                        body: JSON.stringify(newTextObj)
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        console.log(`Works: ${result}`);
+                        if (page === 'all') {
+                            counter -= quantity;
+                            loadPosts('all', null);
+                        } else if (page === 'user') {
+                            counter -= quantity;
+                            loadPosts('user', username);
+                        }
+                    })
+                    .catch(err => console.log(err));
+
+            })
+        }
     }
 
     postDiv.append(userTimeDiv);
-    postDiv.append(post_body);
+    postDiv.append(post_container);
     postDiv.append(likes_flex);
 
     if (document.querySelector('#all-posts') !== null) {
@@ -381,4 +432,13 @@ function followButtons(main_user, viewed_user) {
 
             })
     }
+}
+
+function editPost(page, username, post, post_element, post_container) {
+    document.querySelectorAll('.edit-button').forEach(button => {
+        button.remove();
+    })
+    text = post_element.innerHTML;
+    post_element.style.display = 'none';
+
 }

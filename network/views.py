@@ -104,7 +104,6 @@ def view_posts(request, posts):
 
     elif posts == 'following':
             if request.user.is_authenticated:
-
                 user = request.user
                 followed_users = user.following.all()
                 followed_posts = []
@@ -168,3 +167,16 @@ def follow(request, username):
         return JsonResponse({
         "error": "GET or PUT request required."
     }, status=400)
+
+@csrf_exempt
+@login_required
+def edit(request, id):
+    if request.method != "POST":
+        return JsonResponse({"Error": "Only POST request is allowed."}, status=400)
+    else:
+        post = Post.objects.get(id=id)
+        data = json.loads(request.body)
+        text = data.get("body", "")
+        post.body = text
+        post.save()
+        return JsonResponse(text, safe=False)

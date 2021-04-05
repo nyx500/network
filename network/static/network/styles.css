@@ -73,14 +73,38 @@
     cursor: pointer;
 }
 
-.post-body {
+.post-container {
     order: 2;
-    align-self: stretch;
+    display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
 }
 
+.post-body {
+    order: 1;
+    justify-content: center;
+}
+
+.input-container {
+    order: 2;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.text-input {
+    order: 1;
+    justify-content: center;
+    align-self: stretch;
+}
+
+.submit-button {
+    order: 2;
+    margin-top: 10px;
+    margin-right: auto;
+}
+
 .likes-flex {
+    margin: 5px;
     order: 3;
     display: flex;
     flex-direction: row;
