@@ -104,16 +104,23 @@ def view_posts(request, posts):
 
     elif posts == 'following':
             if request.user.is_authenticated:
+
                 user = request.user
                 followed_users = user.following.all()
                 followed_posts = []
                 all_posts = Post.objects.all().order_by('-timestamp')
+
                 for post in all_posts:
                     if post.user in followed_users:
                         followed_posts.append(post)
-                return JsonResponse([post.serialize() for post in followed_posts], safe=False)
+                
+                amount = len(followed_posts) - 1
+
+                all_data = paginate(start, end, amount, followed_posts)
+
+                return JsonResponse(all_data, safe=False)
             else:
-                return JsonResponse({"ERROR": "Please log in"})
+                return render(request, "network/login.html")
     else:
         if User.objects.filter(username=posts).exists():
             select_user = User.objects.get(username=posts)
