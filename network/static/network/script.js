@@ -30,8 +30,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (logged_in_username != null) {
 
         document.querySelector('#username').addEventListener('click', () => {
-            loadPosts('user', logged_in_username);
             document.querySelector('body').style.backgroundColor = 'green';
+            counter = 0;
+            loadPosts('user', logged_in_username);
+
         })
 
         document.querySelector('#follow-link').addEventListener('click', () => {
@@ -138,9 +140,21 @@ function loadPosts(page, username) {
 
     } else if (page === 'user') {
 
+        console.log(`Counter: ${counter}`);
+        const start = counter;
+        const end = start + quantity - 1;
+        counter = end + 1;
 
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
+        }
+
+        if (document.querySelector('#title') !== null) {
+            document.querySelector('#title-text').innerHTML = `${username}`;
+            document.querySelector('#title').onclick = () => {
+                counter = 0;
+                loadPosts('user', username);
+            }
         }
 
         fetch(`/get_user/${username}`)
@@ -156,30 +170,27 @@ function loadPosts(page, username) {
 
                 console.log(`THIS PAGE'S USER: ${JSON.stringify(response)}`);
             })
-
         console.log(`USERNAME: ${username}`);
 
-        if (document.querySelector('#title') !== null) {
-            document.querySelector('#title-text').innerHTML = `${username}`;
-            document.querySelector('#title-text').onclick = function() {
-                loadPosts('user', username);
-            }
-        }
-
-        fetch(`/view_posts/${username}`)
+        fetch(`/view_posts/${username}?start=${start}&end=${end}`)
             .then(response => response.json())
             .then(posts => {
+
                 console.log(posts);
+                console.log(`Counter Error: ${counter}`);
 
                 while (document.querySelector('.individual-post')) {
                     document.querySelectorAll('.individual-post').forEach(post => {
                         post.remove();
                     })
                 }
-
-                posts.forEach(post => {
+                console.log(`User's posts: ${posts}`)
+                var actual_posts = posts[0]["posts"];
+                actual_posts.forEach(post => {
                     printPost(post);
                 })
+
+                pagination(posts, 'user', username);
             })
 
         if (document.getElementById('user_username')) {
@@ -353,6 +364,7 @@ function printPost(post) {
     username.style.alignSelf = 'flex-start';
 
     username.onclick = function() {
+        counter = 0;
         loadPosts('user', post.user);
     }
 
@@ -389,6 +401,10 @@ function pagination(posts, page, username) {
 
     if (document.querySelector('.next-button')) {
         document.querySelector('.next-button').remove();
+    }
+
+    if (document.querySelector('.previous-button')) {
+        document.querySelector('.previous-button').remove();
     }
 
     if (posts[1]["pages_loaded"] == "more_posts") {

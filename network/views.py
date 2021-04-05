@@ -125,7 +125,9 @@ def view_posts(request, posts):
         if User.objects.filter(username=posts).exists():
             select_user = User.objects.get(username=posts)
             user_posts = select_user.posts.all().order_by('-timestamp')
-            return JsonResponse([post.serialize() for post in user_posts], safe=False)
+            amount = len(user_posts) - 1
+            all_data = paginate(start, end, amount, user_posts)
+            return JsonResponse(all_data, safe=False)
         else:
             return JsonResponse({"Error": "No such user/page"})
 
