@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPosts('all', null);
 
     if (document.getElementById('user_username')) {
-        var logged_in_username = JSON.parse(document.getElementById('user_username').textContent);
+        window.user = JSON.parse(document.getElementById('user_username').textContent);
     } else {
-        var logged_in_username = null;
+        window.user = null;
     }
 
     if (document.querySelector('#new-post-form') !== null) {
@@ -27,12 +27,12 @@ document.addEventListener('DOMContentLoaded', function() {
         loadPosts('all', null);
     })
 
-    if (logged_in_username != null) {
+    if (window.user != null) {
 
         document.querySelector('#username').addEventListener('click', () => {
             document.querySelector('body').style.backgroundColor = 'green';
             counter = 0;
-            loadPosts('user', logged_in_username);
+            loadPosts('user', window.user);
 
         })
 
@@ -94,6 +94,8 @@ function loadPosts(page, username) {
                     })
                 }
                 console.log(`All posts: ${posts}`)
+                console.log(`pages loaded: ${posts[1]["pages_loaded"]}`)
+                console.log(`earlier: ${posts[2]["earlier"]}`)
                 var actual_posts = posts[0]["posts"];
                 actual_posts.forEach(post => {
                     printPost(post);
@@ -160,25 +162,18 @@ function loadPosts(page, username) {
         fetch(`/get_user/${username}`)
             .then(response => response.json())
             .then(response => {
-
                 JSON.stringify(response);
-
                 document.querySelector('#followers-text').innerHTML = '';
                 document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
                 document.querySelector('#following-text').innerHTML = '';
                 document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
-
-                console.log(`THIS PAGE'S USER: ${JSON.stringify(response)}`);
             })
-        console.log(`USERNAME: ${username}`);
 
         fetch(`/view_posts/${username}?start=${start}&end=${end}`)
             .then(response => response.json())
             .then(posts => {
-
                 console.log(posts);
                 console.log(`Counter Error: ${counter}`);
-
                 while (document.querySelector('.individual-post')) {
                     document.querySelectorAll('.individual-post').forEach(post => {
                         post.remove();
@@ -189,35 +184,25 @@ function loadPosts(page, username) {
                 actual_posts.forEach(post => {
                     printPost(post);
                 })
-
                 pagination(posts, 'user', username);
             })
 
-        if (document.getElementById('user_username')) {
-
+        if (window.user) {
             console.log(`User which page this is: ${username}`);
-            console.log(`Logged in user's username: ${JSON.parse(document.getElementById('user_username').textContent)}`);
-
+            console.log(`Logged in user's username: ${window.user}`);
             if (username !== `${JSON.parse(document.getElementById('user_username').textContent)}`) {
                 var result = "different";
             } else {
                 var result = "same";
             }
-
             console.log(`Status: ${result}`);
-
             if (result === "different") {
-
                 document.querySelector('body').style.backgroundColor = 'grey';
-
                 fetch(`/follow/${username}`)
                     .then(response => response.json())
                     .then(response => {
-
                         var answer = response['answer']
-
                         console.log(`Answer: ${answer}`);
-
                         button = document.createElement('button');
                         button.className = 'follow btn btn-primary';
                         button.style.order = '3';
@@ -407,20 +392,11 @@ function pagination(posts, page, username) {
         document.querySelector('.previous-button').remove();
     }
 
-    if (posts[1]["pages_loaded"] == "more_posts") {
-        const next = document.createElement('button');
-        next.innerHTML = "Next";
-        next.className = "next-button btn btn-primary";
-        document.querySelector('#all-posts').append(next);
-        next.addEventListener('click', () => {
-            loadPosts(page, username);
-        })
-    }
-
     if (posts[2]["earlier"] === true) {
         const previous = document.createElement('button');
         previous.innerHTML = "Previous";
         previous.className = "previous-button btn btn-primary";
+        previous.style.marginRight = '10px';
         document.querySelector('#all-posts').append(previous);
         previous.addEventListener('click', () => {
             if (counter - quantity >= 0) {
@@ -434,5 +410,15 @@ function pagination(posts, page, username) {
         if (document.querySelector('.previous-button')) {
             document.querySelector('.previous-button').remove;
         }
+    }
+
+    if (posts[1]["pages_loaded"] == "more_posts") {
+        const next = document.createElement('button');
+        next.innerHTML = "Next";
+        next.className = "next-button btn btn-primary";
+        document.querySelector('#all-posts').append(next);
+        next.addEventListener('click', () => {
+            loadPosts(page, username);
+        })
     }
 }
