@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
             counter = 0;
             username = JSON.parse(document.getElementById('user_username').textContent);
             document.querySelector("#followers").style.display = 'none';
+            document.querySelector("#follow-button-div").style.display = 'none';
             loadPosts('following', username);
         })
     }
@@ -137,6 +138,7 @@ function loadPosts(page, username) {
     } else if (page === 'user') {
 
         document.querySelector("#followers").style.display = 'flex';
+        document.querySelector("#follow-button-div").style.display = 'flex';
 
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
@@ -220,13 +222,6 @@ function printPost(post) {
 
     const postDiv = document.createElement('div');
     postDiv.className = "individual-post";
-    postDiv.style.border = '1.6px solid black';
-    postDiv.style.padding = '5px';
-    postDiv.style.borderRadius = '6px';
-    postDiv.style.marginBottom = '10px';
-    postDiv.style.display = 'flex';
-    postDiv.style.flexDirection = 'column';
-    postDiv.style.flexWrap = 'wrap';
     const userTimeDiv = document.createElement('div');
     userTimeDiv.style.display = 'flex';
     userTimeDiv.style.flexDirection = 'row';
@@ -236,8 +231,6 @@ function printPost(post) {
 
     const username = document.createElement('h2');
     username.innerHTML = `${post.user}`;
-    username.style.order = '1';
-    username.style.alignSelf = 'flex-start';
     username.className = 'username-link';
 
     username.onclick = function() {
@@ -253,16 +246,27 @@ function printPost(post) {
     timestamp.style.alignSelf = 'flex-end';
     userTimeDiv.append(timestamp);
     const post_body = document.createElement('h6');
+    post_body.className = 'post-body'
     post_body.innerHTML = post.body;
-    post_body.style.order = '2';
-    post_body.style.alignSelf = 'stretch';
+
+    const likes_flex = document.createElement('div');
+    likes_flex.className = 'likes-flex';
     const likes = document.createElement('h6');
     likes.innerHTML = `Likes: ${post.likes}`;
-    likes.style.order = '3';
-    likes.style.alignSelf = 'flex-start';
+    likes.className = 'likes';
+    likes_flex.append(likes);
+
+    if (post.user === window.user) {
+        edit_button = document.createElement('button');
+        edit_button.className = 'edit-button btn btn-light';
+        edit_button.innerHTML = "Edit";
+        likes_flex.append(edit_button);
+    }
+
     postDiv.append(userTimeDiv);
     postDiv.append(post_body);
-    postDiv.append(likes);
+    postDiv.append(likes_flex);
+
     if (document.querySelector('#all-posts') !== null) {
         document.querySelector('#all-posts').append(postDiv);
     }
@@ -317,11 +321,7 @@ function followButtons(main_user, viewed_user) {
 
         button = document.createElement('button');
         button.className = 'follow btn btn-primary';
-        button.style.order = '3';
-        button.style.alignSelf = 'flex-end';
-        button.style.marginLeft = '20px';
-        button.style.marginRight = '20px';
-        document.querySelector('#followers').append(button);
+        document.querySelector('#follow-button-div').append(button);
 
         fetch(`/follow/${viewed_user}`)
             .then(response => response.json())

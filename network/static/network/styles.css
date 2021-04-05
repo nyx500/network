@@ -9,9 +9,28 @@
     justify-content: flex-start;
 }
 
+.individual-post {
+    width: 100%;
+    border: 1.6px solid black;
+    padding: 5px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
 #followers {
     margin-left: 10px;
-    padding: 10px;
+    font-size: 36px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+#follow-button-div {
+    margin-left: 10px;
     font-size: 36px;
     display: flex;
     flex-direction: row;
@@ -21,7 +40,6 @@
 
 #title-text {
     order: 1;
-    align-self: flex-start;
 }
 
 #followers-text {
@@ -29,6 +47,7 @@
     align-self: flex-start;
     margin-left: 20px;
     margin-right: 20px;
+    margin-top: 10px;
 }
 
 #following-text {
@@ -36,13 +55,50 @@
     align-self: auto;
     margin-left: 20px;
     margin-right: 20px;
+    margin-top: 10px;
+}
+
+.follow {
+    order: 1;
+    align-self: flex-start;
+    margin-left: 22px;
 }
 
 .username-link {
+    order: 1;
+    align-self: flex-start;
     font-size: 28px;
     font-weight: bold;
     margin-bottom: 10px;
     cursor: pointer;
+}
+
+.post-body {
+    order: 2;
+    align-self: stretch;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.likes-flex {
+    order: 3;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.likes {
+    order: 1;
+    align-self: flex-start;
+}
+
+.edit-button {
+    order: 2;
+    align-self: flex-end;
+    margin-left: auto;
+    min-width: 60px;
+    background-color: lightyellow;
+    border: 2px solid goldenrod;
 }
 
 #index-container {
