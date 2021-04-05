@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('body').style.backgroundColor = 'orange';
             counter = 0;
             username = JSON.parse(document.getElementById('user_username').textContent);
+            document.querySelector("#followers").style.display = 'none';
             loadPosts('following', username);
         })
     }
@@ -141,6 +142,8 @@ function loadPosts(page, username) {
             })
 
     } else if (page === 'user') {
+
+        document.querySelector("#followers").style.display = 'flex';
 
         console.log(`Counter: ${counter}`);
         const start = counter;
@@ -258,16 +261,11 @@ function printPost(post) {
     username.innerHTML = `${post.user}`;
     username.style.order = '1';
     username.style.alignSelf = 'flex-start';
+    username.className = 'username_link';
 
     username.onclick = function() {
         counter = 0;
         loadPosts('user', post.user);
-    }
-
-    const username_link = "username-link";
-    var arr2 = username.className.split(" ");
-    if (arr2.indexOf(username_link) == -1) {
-        username.className += " " + username_link;
     }
 
     userTimeDiv.append(username);
@@ -334,27 +332,23 @@ function pagination(posts, page, username) {
     }
 }
 
+
+// Toggles follow and unfollow buttons when user clicks on them and sends a put request to the server to update lists of followers for a user
 function followButtons(main_user, viewed_user) {
 
-    console.log(`User which page this is: ${viewed_user}`);
-    console.log(`Logged in user's username: ${main_user}`);
-
     if (main_user !== viewed_user) {
-        var result = "different";
-        console.log(`Is user same? ${result}`);
-        document.querySelector('body').style.backgroundColor = 'grey';
+
+        button = document.createElement('button');
+        button.className = 'follow btn btn-primary';
+        button.style.order = '3';
+        button.style.alignSelf = 'flex-end';
+        button.style.marginLeft = '20px';
+        button.style.marginRight = '20px';
+
         fetch(`/follow/${viewed_user}`)
             .then(response => response.json())
             .then(response => {
                 console.log(`Answer: ${response['answer']}`);
-
-                button = document.createElement('button');
-                button.className = 'follow btn btn-primary';
-                button.style.order = '3';
-                button.style.alignSelf = 'flex-end';
-                button.style.marginLeft = '20px';
-                button.style.marginRight = '20px';
-
                 if (response['answer'] === false) {
 
                     button.innerHTML = "Follow";
@@ -381,17 +375,14 @@ function followButtons(main_user, viewed_user) {
                             })
 
                         counter = 0;
-
                         loadPosts('user', viewed_user);
-
-                        console.log(`Followed ${viewed_user}`);
 
                     }
                 } else {
+
                     button.innerHTML = '';
                     button.innerHTML = "Unfollow";
                     document.querySelector('#followers').append(button);
-                    console.log("Button unfollow");
                     button.onclick = () => {
 
                         fetch(`/follow/${viewed_user}`, {
@@ -412,21 +403,12 @@ function followButtons(main_user, viewed_user) {
 
                                 counter = 0;
                                 loadPosts('user', viewed_user);
-                                console.log(`Followed ${viewed_user}`);
 
                             })
-
-                        console.log(`Unfollowed ${viewed_user}`);
 
                     }
                 }
 
             })
-    } else {
-        var result = "same";
-        console.log(`Is user same? Is${result}`)
-        document.querySelector('body').style.backgroundColor = 'goldenrod';
     }
-
-
 }
