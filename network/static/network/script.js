@@ -56,6 +56,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function loadPosts(page, username) {
 
+    console.log(`Counter: ${counter}`);
+    const start = counter;
+    const end = start + quantity - 1;
+    counter = end + 1;
+
     if (document.querySelector('#new-post')) {
         document.querySelector('#new-post').style.display = 'block';
     }
@@ -65,12 +70,6 @@ function loadPosts(page, username) {
     }
 
     if (page === 'all') {
-
-        console.log(`Counter: ${counter}`);
-        const start = counter;
-        const end = start + quantity - 1;
-        counter = end + 1;
-
 
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = 'All Posts';
@@ -107,11 +106,6 @@ function loadPosts(page, username) {
 
     } else if (page === 'following') {
 
-        console.log(`Counter: ${counter}`);
-        const start = counter;
-        const end = start + quantity - 1;
-        counter = end + 1;
-
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
         }
@@ -132,9 +126,8 @@ function loadPosts(page, username) {
                         post.remove();
                     })
                 }
-                console.log(`Followed posts: ${posts}`)
-                var actual_posts = posts[0]["posts"];
-                actual_posts.forEach(post => {
+                console.log(`Followed posts: ${posts}`);
+                posts[0]["posts"].forEach(post => {
                     printPost(post);
                 })
 
@@ -144,11 +137,6 @@ function loadPosts(page, username) {
     } else if (page === 'user') {
 
         document.querySelector("#followers").style.display = 'flex';
-
-        console.log(`Counter: ${counter}`);
-        const start = counter;
-        const end = start + quantity - 1;
-        counter = end + 1;
 
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
@@ -166,25 +154,19 @@ function loadPosts(page, username) {
             .then(response => response.json())
             .then(response => {
                 JSON.stringify(response);
-                document.querySelector('#followers-text').innerHTML = '';
                 document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
-                document.querySelector('#following-text').innerHTML = '';
                 document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
             })
 
         fetch(`/view_posts/${username}?start=${start}&end=${end}`)
             .then(response => response.json())
             .then(posts => {
-                console.log(posts);
-                console.log(`Counter Error: ${counter}`);
                 while (document.querySelector('.individual-post')) {
                     document.querySelectorAll('.individual-post').forEach(post => {
                         post.remove();
                     })
                 }
-                console.log(`User's posts: ${posts}`)
-                var actual_posts = posts[0]["posts"];
-                actual_posts.forEach(post => {
+                posts[0]["posts"].forEach(post => {
                     printPost(post);
                 })
                 pagination(posts, 'user', username);
@@ -237,12 +219,7 @@ function newPost() {
 function printPost(post) {
 
     const postDiv = document.createElement('div');
-    const individual_post = "individual-post";
-    var arr1 = postDiv.className.split(" ");
-    if (arr1.indexOf(individual_post) == -1) {
-        postDiv.className += " " + individual_post;
-    }
-
+    postDiv.className = "individual-post";
     postDiv.style.border = '1.6px solid black';
     postDiv.style.padding = '5px';
     postDiv.style.borderRadius = '6px';
@@ -261,7 +238,7 @@ function printPost(post) {
     username.innerHTML = `${post.user}`;
     username.style.order = '1';
     username.style.alignSelf = 'flex-start';
-    username.className = 'username_link';
+    username.className = 'username-link';
 
     username.onclick = function() {
         counter = 0;
@@ -344,6 +321,7 @@ function followButtons(main_user, viewed_user) {
         button.style.alignSelf = 'flex-end';
         button.style.marginLeft = '20px';
         button.style.marginRight = '20px';
+        document.querySelector('#followers').append(button);
 
         fetch(`/follow/${viewed_user}`)
             .then(response => response.json())
@@ -352,7 +330,6 @@ function followButtons(main_user, viewed_user) {
                 if (response['answer'] === false) {
 
                     button.innerHTML = "Follow";
-                    document.querySelector('#followers').append(button);
 
                     button.onclick = () => {
 
@@ -367,10 +344,7 @@ function followButtons(main_user, viewed_user) {
                         fetch(`/get_user/${viewed_user}`)
                             .then(response => response.json())
                             .then(response => {
-
-                                document.querySelector('#followers-text').innerHTML = '';
                                 document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
-                                document.querySelector('#following-text').innerHTML = '';
                                 document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
                             })
 
@@ -379,10 +353,7 @@ function followButtons(main_user, viewed_user) {
 
                     }
                 } else {
-
-                    button.innerHTML = '';
                     button.innerHTML = "Unfollow";
-                    document.querySelector('#followers').append(button);
                     button.onclick = () => {
 
                         fetch(`/follow/${viewed_user}`, {
@@ -396,9 +367,8 @@ function followButtons(main_user, viewed_user) {
                         fetch(`/get_user/${viewed_user}`)
                             .then(response => response.json())
                             .then(response => {
-                                document.querySelector('#followers-text').innerHTML = '';
+
                                 document.querySelector('#followers-text').innerHTML = `Followers: ${response[0]["followers"]}`;
-                                document.querySelector('#following-text').innerHTML = '';
                                 document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
 
                                 counter = 0;
