@@ -140,9 +140,8 @@ def get_user(request, username):
 @csrf_exempt
 @login_required
 def follow(request, username):
-
-    username1 = username
-    user = User.objects.get(username=username1)
+    
+    user = User.objects.get(username=username)
 
     if request.method == "GET":
         followers = user.followers.all()

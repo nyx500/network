@@ -120,6 +120,7 @@
 .like-div {
     order: 2;
     margin-left: 10px;
+    cursor: pointer;
 }
 
 #heart {
