@@ -1,3 +1,26 @@
+body {
+    background-color: bisque;
+}
+
+#navigation-bar {
+    background-color: goldenrod!important;
+}
+
+.individual-post {
+    background-color: palegoldenrod;
+}
+
+.form-group .btn {
+    background-color: khaki;
+    border: 1px solid darkkhaki;
+    color: olive;
+}
+
+.form-group .btn:hover {
+    box-shadow: 1px 1px 2px 2px;
+    color: rgb(87, 87, 3);
+}
+
 #title {
     margin-left: 10px;
     padding: 10px;
@@ -71,6 +94,7 @@
     font-weight: bold;
     margin-bottom: 10px;
     cursor: pointer;
+    color: rgb(78, 67, 2);
 }
 
 .post-container {
@@ -137,6 +161,13 @@
     border: 2px solid goldenrod;
 }
 
+.edit-button:hover {
+    box-shadow: 1px 1px 2px 2px;
+    color: rgb(49, 49, 1);
+    background-color: goldenrod;
+    border: olive;
+}
+
 #index-container {
     display: grid;
     grid-template-columns: [col1-start] 100% [col1-end];
@@ -150,8 +181,9 @@
 }
 
 #new-post {
-    border: 1px solid grey;
+    border: 1.5px solid black;
     border-radius: 6px;
+    background-color: lemonchiffon;
 }
 
 .item {
@@ -182,4 +214,12 @@
 
 #title {
     cursor: pointer;
+}
+
+.footer {
+    margin-top: 100vh;
+}
+
+.space {
+    margin-top: 100vh;
 }
