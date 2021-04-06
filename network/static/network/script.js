@@ -94,9 +94,7 @@ function loadPosts(page, username) {
                         post.remove();
                     })
                 }
-                console.log(`All posts: ${posts}`)
-                console.log(`pages loaded: ${posts[1]["pages_loaded"]}`)
-                console.log(`earlier: ${posts[2]["earlier"]}`)
+                console.log(posts)
                 var actual_posts = posts[0]["posts"];
                 actual_posts.forEach(post => {
                     printPost('all', username, post);
@@ -127,7 +125,7 @@ function loadPosts(page, username) {
                         post.remove();
                     })
                 }
-                console.log(`Followed posts: ${posts}`);
+                console.log(posts);
                 posts[0]["posts"].forEach(post => {
                     printPost('following', username, post);
                 })
@@ -274,6 +272,68 @@ function printPost(page, username, post) {
     likes.innerHTML = `Likes: ${post.likes}`;
     likes.className = 'likes';
     likes_flex.append(likes);
+    const like_div = document.createElement('div');
+    like_div.className = "like-div";
+    likes_flex.append(like_div);
+
+    if (window.user !== null) {
+        fetch(`/like/${post.id}`)
+            .then(response => response.json())
+            .then(response => {
+                if (response["action"] === "like") {
+                    const heart = document.createElement('img');
+                    heart.src = "static/network/blackheart.png";
+                    heart.id = 'heart';
+                    like_div.append(heart);
+                    like_div.onclick = () => {
+                        fetch(`/like/${post.id}`, {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    body: 'like'
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(response => {
+                                counter -= quantity;
+                                if (page === 'all') {
+                                    loadPosts('all', null);
+                                } else if (page === 'user') {
+                                    loadPosts('user', username);
+                                } else if (page === 'following') {
+                                    loadPosts('following', username);
+                                }
+                            })
+                            .catch(err => console.log(err));
+                    }
+                } else if (response["action"] === "unlike") {
+                    const heart = document.createElement('img');
+                    heart.src = "static/network/heart.png";
+                    heart.id = 'heart';
+                    like_div.append(heart);
+                    like_div.onclick = () => {
+                        fetch(`/like/${post.id}`, {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    body: 'unlike'
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(response => {
+                                counter -= quantity;
+                                if (page === 'all') {
+                                    loadPosts('all', null);
+                                } else if (page === 'user') {
+                                    loadPosts('user', username);
+                                } else if (page === 'following') {
+                                    loadPosts('following', username);
+                                }
+                            })
+                            .catch(err => console.log(err));
+                    }
+                } else {}
+            })
+            .catch(err => console.log(err));
+    }
 
     if (post.user === window.user) {
         edit_button = document.createElement('button');
@@ -299,12 +359,10 @@ function printPost(page, username, post) {
                     })
                     .then(response => response.json())
                     .then(result => {
-                        console.log(`Works: ${result}`);
+                        counter -= quantity;
                         if (page === 'all') {
-                            counter -= quantity;
                             loadPosts('all', null);
                         } else if (page === 'user') {
-                            counter -= quantity;
                             loadPosts('user', username);
                         }
                     })
@@ -357,10 +415,12 @@ function pagination(posts, page, username) {
         const next = document.createElement('button');
         next.innerHTML = "Next";
         next.className = "next-button btn btn-primary";
-        document.querySelector('#all-posts').append(next);
-        next.addEventListener('click', () => {
-            loadPosts(page, username);
-        })
+        if (document.querySelector('#all-posts')) {
+            document.querySelector('#all-posts').append(next);
+            next.addEventListener('click', () => {
+                loadPosts(page, username);
+            })
+        }
     }
 }
 
@@ -377,7 +437,6 @@ function followButtons(main_user, viewed_user) {
         fetch(`/follow/${viewed_user}`)
             .then(response => response.json())
             .then(response => {
-                console.log(`Answer: ${response['answer']}`);
                 if (response['answer'] === false) {
 
                     button.innerHTML = "Follow";
@@ -432,13 +491,4 @@ function followButtons(main_user, viewed_user) {
 
             })
     }
-}
-
-function editPost(page, username, post, post_element, post_container) {
-    document.querySelectorAll('.edit-button').forEach(button => {
-        button.remove();
-    })
-    text = post_element.innerHTML;
-    post_element.style.display = 'none';
-
 }

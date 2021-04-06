@@ -114,6 +114,17 @@
 .likes {
     order: 1;
     align-self: flex-start;
+    margin-top: 4px;
+}
+
+.like-div {
+    order: 2;
+    margin-left: 10px;
+}
+
+#heart {
+    width: 22px;
+    height: 22px;
 }
 
 .edit-button {

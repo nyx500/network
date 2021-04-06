@@ -165,7 +165,7 @@ def follow(request, username):
     
     else:
         return JsonResponse({
-        "error": "GET or PUT request required."
+        "Error": "GET or PUT request required."
     }, status=400)
 
 @csrf_exempt
@@ -175,8 +175,45 @@ def edit(request, id):
         return JsonResponse({"Error": "Only POST request is allowed."}, status=400)
     else:
         post = Post.objects.get(id=id)
+        if post.user == request.user:
+            data = json.loads(request.body)
+            text = data.get("body", "")
+            post.body = text
+            post.save()
+            return JsonResponse(text, safe=False)
+        else:
+            return JsonResponse({"Error": "You are not the user who created this post!!"}, status=400)
+
+@csrf_exempt
+@login_required
+def like(request, post_id):
+    if request.method == "GET":
+        post = Post.objects.get(id=post_id)
+        queryset = Like.objects.filter(user=request.user).filter(post=post)
+        if len(queryset) == 1:
+            response = {"action": "unlike"}
+        elif len(queryset) == 0:
+            response = {"action": "like"}
+        else:
+            response = {"action": "error"}
+        return JsonResponse(response)
+    elif request.method == "POST":
+        post = Post.objects.get(id=post_id)
         data = json.loads(request.body)
-        text = data.get("body", "")
-        post.body = text
-        post.save()
-        return JsonResponse(text, safe=False)
+        if data.get("body", "") == 'like':
+            new_like = Like(
+                user = request.user,
+                post = post
+            )
+            new_like.save()
+            return JsonResponse({"Success": "You liked this post"})
+        elif data.get("body", "") == 'unlike':
+            queryset = Like.objects.filter(user=request.user).filter(post=post)
+            queryset[0].delete()
+            return JsonResponse({"Success": "You unliked this post"})
+        else:
+            return JsonResponse({"Error": "You unliked this post"})
+    else:
+        JsonResponse({"Error": "Request method must be GET or POST"}, status=400)
+    
+   
