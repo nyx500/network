@@ -14,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (document.querySelector('#new-post-form') !== null) {
         document.querySelector('#new-post-form').onsubmit = function() {
-            getCookie('csrftoken');
             newPost();
         }
     }
@@ -178,35 +177,15 @@ function loadPosts(page, username) {
     }
 }
 
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
 function newPost() {
 
-    let csrftoken = getCookie('csrftoken');
-
     let postObj = {
-        body: `${document.querySelector('#new-post-input').value}`,
-        csrfmiddlewaretoken: csrftoken,
+        body: `${document.querySelector('#new-post-input').value}`
     };
 
     fetch('/post', {
             method: 'POST',
-            body: JSON.stringify(postObj),
-            headers: { "X-CSRFToken": csrftoken },
+            body: JSON.stringify(postObj)
         })
         .then(response => response.json())
         .then(result => {

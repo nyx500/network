@@ -7,11 +7,7 @@ from django.urls import reverse
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.views.generic import ListView
 from .models import *
-import time
-import math
 from .functions import paginate
 
 
@@ -43,6 +39,8 @@ def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("index"))
 
+@csrf_exempt
+@login_required
 def post(request):
 
     if request.method != "POST":
@@ -140,7 +138,7 @@ def get_user(request, username):
 @csrf_exempt
 @login_required
 def follow(request, username):
-    
+
     user = User.objects.get(username=username)
 
     if request.method == "GET":
