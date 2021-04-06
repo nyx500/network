@@ -4,8 +4,10 @@ const quantity = 10;
 
 document.addEventListener('DOMContentLoaded', function() {
 
+    // Automatically loads all posts
     loadPosts('all', null);
 
+    // Gets and stores the user's username from template if user is logged in
     if (document.getElementById('user_username')) {
         window.user = JSON.parse(document.getElementById('user_username').textContent);
     } else {
@@ -21,46 +23,37 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('#network').addEventListener('click', () => {
         loadPosts('all', null);
     })
-
     document.querySelector('#all').addEventListener('click', () => {
         loadPosts('all', null);
     })
-
     if (window.user != null) {
-
         document.querySelector('#username').addEventListener('click', () => {
-            document.querySelector('body').style.backgroundColor = 'green';
             counter = 0;
             loadPosts('user', window.user);
-
         })
-
         document.querySelector('#follow-link').addEventListener('click', () => {
-            document.querySelector('body').style.backgroundColor = 'orange';
             counter = 0;
-            username = JSON.parse(document.getElementById('user_username').textContent);
             document.querySelector("#followers").style.display = 'none';
             document.querySelector("#follow-button-div").style.display = 'none';
-            loadPosts('following', username);
+            loadPosts('following', window.user);
         })
     }
-
-
     while (document.querySelector('.individual-post')) {
         document.querySelectorAll('.individual-post').forEach(post => {
             post.remove();
         })
     }
-
 });
 
 function loadPosts(page, username) {
 
+    // Sets a counter for pagination purposes
     console.log(`Counter: ${counter}`);
     const start = counter;
     const end = start + quantity - 1;
     counter = end + 1;
 
+    // Displays the new post form
     if (document.querySelector('#new-post')) {
         document.querySelector('#new-post').style.display = 'block';
     }
@@ -70,7 +63,6 @@ function loadPosts(page, username) {
     }
 
     if (page === 'all') {
-
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = 'All Posts';
             document.querySelector('#title').onclick = () => {
@@ -78,12 +70,9 @@ function loadPosts(page, username) {
                 loadPosts('all', null);
             }
         }
-
         if (document.querySelector('#index-container') !== null) {
             document.querySelector('#index-container').style.display = 'grid';
         }
-
-        document.querySelector('body').style.backgroundColor = 'red';
 
         fetch(`/view_posts/${page}?start=${start}&end=${end}`)
             .then(response => response.json())
@@ -94,8 +83,8 @@ function loadPosts(page, username) {
                     })
                 }
                 console.log(posts)
-                var actual_posts = posts[0]["posts"];
-                actual_posts.forEach(post => {
+                var new_posts = posts[0]["posts"];
+                new_posts.forEach(post => {
                     printPost('all', username, post);
                 })
 
@@ -104,6 +93,7 @@ function loadPosts(page, username) {
 
     } else if (page === 'following') {
 
+        // Hides new post form when on the Following page
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
         }
@@ -134,9 +124,11 @@ function loadPosts(page, username) {
 
     } else if (page === 'user') {
 
+        // Displays number of followers for that user
         document.querySelector("#followers").style.display = 'flex';
         document.querySelector("#follow-button-div").style.display = 'flex';
 
+        // Hides new post form on all posts page
         if (document.querySelector('#new-post')) {
             document.querySelector('#new-post').style.display = 'none';
         }
@@ -149,6 +141,7 @@ function loadPosts(page, username) {
             }
         }
 
+        // Gets the user object from the database for the user's page to display data on following and followers
         fetch(`/get_user/${username}`)
             .then(response => response.json())
             .then(response => {
