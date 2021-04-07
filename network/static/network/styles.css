@@ -6,6 +6,22 @@ body {
     background-color: goldenrod!important;
 }
 
+.navbar-brand {
+    font-weight: 800!important;
+}
+
+.navbar-brand:hover {
+    color: darkgreen!important;
+}
+
+.nav-link {
+    color: black!important;
+}
+
+.nav-link:hover {
+    color: darkgreen!important;
+}
+
 .individual-post {
     background-color: palegoldenrod;
 }
@@ -30,6 +46,10 @@ body {
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: flex-start;
+}
+
+#title:hover {
+    color: darkgreen;
 }
 
 .individual-post {
@@ -95,6 +115,10 @@ body {
     margin-bottom: 10px;
     cursor: pointer;
     color: rgb(78, 67, 2);
+}
+
+.username-link:hover {
+    color: forestgreen;
 }
 
 .post-container {
@@ -163,9 +187,10 @@ body {
 
 .edit-button:hover {
     box-shadow: 1px 1px 2px 2px;
-    color: rgb(49, 49, 1);
+    color: green;
     background-color: goldenrod;
     border: olive;
+    font-weight: 600;
 }
 
 #index-container {
@@ -186,6 +211,12 @@ body {
     background-color: lemonchiffon;
 }
 
+#new-button:hover {
+    color: darkgreen;
+    background-color: goldenrod;
+    font-weight: 600;
+}
+
 .item {
     grid-column-start: 1;
     grid-column-end: span col-1end;
@@ -204,6 +235,11 @@ body {
     margin: 0px;
 }
 
+#no-posts {
+    text-align: center;
+    height: 60vh;
+}
+
 .form-group input {
     margin: 4px;
 }
@@ -216,10 +252,13 @@ body {
     cursor: pointer;
 }
 
-.footer {
-    margin-top: 100vh;
+footer {
+    position: absolute;
+    margin-top: 6vh;
+    float: bottom;
+    width: 100%;
 }
 
-.space {
-    margin-top: 100vh;
+.login-register {
+    margin-bottom: 36vh;
 }

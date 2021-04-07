@@ -14,12 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
         window.user = null;
     }
 
-    if (document.querySelector('#new-post-form') !== null) {
-        document.querySelector('#new-post-form').onsubmit = function() {
-            newPost();
-        }
-    }
-
     document.querySelector('#network').addEventListener('click', () => {
         loadPosts('all', null);
     })
@@ -38,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             loadPosts('following', window.user);
         })
     }
+    // Clears posts when page loaded
     while (document.querySelector('.individual-post')) {
         document.querySelectorAll('.individual-post').forEach(post => {
             post.remove();
@@ -63,6 +58,15 @@ function loadPosts(page, username) {
     }
 
     if (page === 'all') {
+
+        if (document.querySelector('#new-post')) {
+            document.querySelector('#new-post').style.display = 'block';
+            document.querySelector('#new-button').onclick = function() {
+                newPost(page, username);
+            }
+
+        }
+
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = 'All Posts';
             document.querySelector('#title').onclick = () => {
@@ -91,21 +95,7 @@ function loadPosts(page, username) {
             }
         }
 
-        fetch(`/view_posts/${page}?start=${start}&end=${end}`)
-            .then(response => response.json())
-            .then(posts => {
-                while (document.querySelector('.individual-post')) {
-                    document.querySelectorAll('.individual-post').forEach(post => {
-                        post.remove();
-                    })
-                }
-                console.log(posts);
-                posts[0]["posts"].forEach(post => {
-                    printPost('following', username, post);
-                })
-
-                pagination(posts, 'following', username);
-            })
+        fetchPostsFromDatabase(page, start, end, username);
 
     } else if (page === 'user') {
 
@@ -113,11 +103,18 @@ function loadPosts(page, username) {
         document.querySelector("#followers").style.display = 'flex';
         document.querySelector("#follow-button-div").style.display = 'flex';
 
-        // Hides new post form on all posts page
+        // Displays new form only if user is same as the user who is logged in
         if (document.querySelector('#new-post')) {
-            document.querySelector('#new-post').style.display = 'none';
+            if (window.user !== username) {
+                document.querySelector('#new-post').style.display = 'none';
+            } else {
+                document.querySelector('#new-post').style.display = 'block';
+                document.querySelector('#new-post-input').value = '';
+                document.querySelector('#new-button').onclick = function() {
+                    newPost('user', username);
+                }
+            }
         }
-
         if (document.querySelector('#title') !== null) {
             document.querySelector('#title-text').innerHTML = `${username}`;
             document.querySelector('#title').onclick = () => {
@@ -135,19 +132,7 @@ function loadPosts(page, username) {
                 document.querySelector('#following-text').innerHTML = `Following: ${response[0]["following"]}`;
             })
 
-        fetch(`/view_posts/${username}?start=${start}&end=${end}`)
-            .then(response => response.json())
-            .then(posts => {
-                while (document.querySelector('.individual-post')) {
-                    document.querySelectorAll('.individual-post').forEach(post => {
-                        post.remove();
-                    })
-                }
-                posts[0]["posts"].forEach(post => {
-                    printPost('user', username, post);
-                })
-                pagination(posts, 'user', username);
-            })
+        fetchPostsFromDatabase(page, start, end, username);
 
         if (window.user) {
             followButtons(window.user, username);
@@ -155,7 +140,8 @@ function loadPosts(page, username) {
     }
 }
 
-function newPost() {
+// Creates a new post and updates the current page with the new post
+function newPost(page, username) {
 
     let postObj = {
         body: `${document.querySelector('#new-post-input').value}`
@@ -167,12 +153,21 @@ function newPost() {
         })
         .then(response => response.json())
         .then(result => {
-            console.log(result);
+            console.log(`New Post: ${result}`);
+        })
+        .then(() => {
+            if (page === 'all') {
+                counter = 0;
+                loadPosts('all', username);
+            } else if (page === 'user') {
+                counter = 0;
+                loadPosts('user', username);
+            }
         })
         .catch(err => console.log(err));
-
 }
 
+// Creates a new post div for every post along with edit option if the post's user is the same user who is logged in
 function printPost(page, username, post) {
 
     const postDiv = document.createElement('div');
@@ -233,6 +228,7 @@ function printPost(page, username, post) {
     like_div.className = "like-div";
     likes_flex.append(like_div);
 
+    // Allows like option only if the user is logged in
     if (window.user !== null) {
         fetch(`/like/${post.id}`)
             .then(response => response.json())
@@ -339,7 +335,18 @@ function printPost(page, username, post) {
 }
 
 function fetchPostsFromDatabase(page, start, end, username) {
-    fetch(`/view_posts/${page}?start=${start}&end=${end}`)
+
+    if (document.querySelector('#no-posts')) {
+        document.querySelector('#no-posts').remove();
+    }
+
+    if (page === 'user') {
+        var url_input = username;
+    } else {
+        var url_input = page;
+    }
+
+    fetch(`/view_posts/${url_input}?start=${start}&end=${end}`)
         .then(response => response.json())
         .then(posts => {
             while (document.querySelector('.individual-post')) {
@@ -347,7 +354,13 @@ function fetchPostsFromDatabase(page, start, end, username) {
                     post.remove();
                 })
             }
-            console.log(posts)
+            console.log(`Posts: ${posts[0]["posts"]}`)
+            if (posts[0]["posts"].length === 0 && page !== 'all') {
+                const no_posts = document.createElement('div');
+                no_posts.innerHTML = '<h5>There are no posts yet</h5>';
+                no_posts.id = 'no-posts';
+                document.querySelector('#index-container').append(no_posts);
+            }
             var new_posts = posts[0]["posts"];
             new_posts.forEach(post => {
                 printPost(page, username, post);

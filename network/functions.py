@@ -1,3 +1,4 @@
+# Calculates which posts should be displayed on which page and tells the front-end application whether there are later or earlier posts to load
 def paginate(start, end, posts):
     data = []
     count_posts = len(posts) - 1
