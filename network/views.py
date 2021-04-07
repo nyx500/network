@@ -94,36 +94,32 @@ def view_posts(request, posts):
     if posts == 'all':
 
         all_posts = Post.objects.all().order_by('-timestamp')
-        amount = len(all_posts) - 1
 
-        all_data = paginate(start, end, amount, all_posts)
-
+        all_data = paginate(start, end, all_posts)
         return JsonResponse(all_data, safe=False)
 
     elif posts == 'following':
-            if request.user.is_authenticated:
-                user = request.user
-                followed_users = user.following.all()
-                followed_posts = []
-                all_posts = Post.objects.all().order_by('-timestamp')
 
-                for post in all_posts:
-                    if post.user in followed_users:
-                        followed_posts.append(post)
+        if request.user.is_authenticated:
+            user = request.user
+            followed_users = user.following.all()
+            followed_posts = []
+            all_posts = Post.objects.all().order_by('-timestamp')
+
+            for post in all_posts:
+                if post.user in followed_users:
+                    followed_posts.append(post)
                 
-                amount = len(followed_posts) - 1
-
-                all_data = paginate(start, end, amount, followed_posts)
-
-                return JsonResponse(all_data, safe=False)
-            else:
-                return render(request, "network/login.html")
+            all_data = paginate(start, end, followed_posts)
+            return JsonResponse(all_data, safe=False)
+        else:
+            return render(request, "network/login.html")
     else:
         if User.objects.filter(username=posts).exists():
             select_user = User.objects.get(username=posts)
             user_posts = select_user.posts.all().order_by('-timestamp')
-            amount = len(user_posts) - 1
-            all_data = paginate(start, end, amount, user_posts)
+
+            all_data = paginate(start, end, user_posts)
             return JsonResponse(all_data, safe=False)
         else:
             return JsonResponse({"Error": "No such user/page"})

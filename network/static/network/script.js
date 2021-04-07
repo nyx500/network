@@ -74,22 +74,7 @@ function loadPosts(page, username) {
             document.querySelector('#index-container').style.display = 'grid';
         }
 
-        fetch(`/view_posts/${page}?start=${start}&end=${end}`)
-            .then(response => response.json())
-            .then(posts => {
-                while (document.querySelector('.individual-post')) {
-                    document.querySelectorAll('.individual-post').forEach(post => {
-                        post.remove();
-                    })
-                }
-                console.log(posts)
-                var new_posts = posts[0]["posts"];
-                new_posts.forEach(post => {
-                    printPost('all', username, post);
-                })
-
-                pagination(posts, 'all', username);
-            })
+        fetchPostsFromDatabase(page, start, end, username);
 
     } else if (page === 'following') {
 
@@ -351,6 +336,25 @@ function printPost(page, username, post) {
     if (document.querySelector('#all-posts') !== null) {
         document.querySelector('#all-posts').append(postDiv);
     }
+}
+
+function fetchPostsFromDatabase(page, start, end, username) {
+    fetch(`/view_posts/${page}?start=${start}&end=${end}`)
+        .then(response => response.json())
+        .then(posts => {
+            while (document.querySelector('.individual-post')) {
+                document.querySelectorAll('.individual-post').forEach(post => {
+                    post.remove();
+                })
+            }
+            console.log(posts)
+            var new_posts = posts[0]["posts"];
+            new_posts.forEach(post => {
+                printPost(page, username, post);
+            })
+
+            pagination(posts, page, username);
+        })
 }
 
 function pagination(posts, page, username) {
