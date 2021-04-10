@@ -354,7 +354,7 @@ function fetchPostsFromDatabase(page, start, end, username) {
                     post.remove();
                 })
             }
-            console.log(`Posts: ${posts[0]["posts"]}`)
+            console.log(`Posts: ${posts[0]["posts"].length}`)
             if (posts[0]["posts"].length === 0 && page !== 'all') {
                 const no_posts = document.createElement('div');
                 no_posts.innerHTML = '<h5>There are no posts yet</h5>';
